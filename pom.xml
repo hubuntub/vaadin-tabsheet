@@ -14,7 +14,7 @@
 	<version>0.1.0-SNAPSHOT</version>
 	<name>vaadin-tabsheet</name>
 	<description>Vaadin tabsheet tests</description>
-	<packaging>jar</packaging>
+	<packaging>war</packaging>
 
 	<dependencies>
 		<!-- Vaadin dependencies -->
