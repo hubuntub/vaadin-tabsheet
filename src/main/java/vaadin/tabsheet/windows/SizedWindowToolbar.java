@@ -27,7 +27,6 @@ public class SizedWindowToolbar extends Window {
 
     public SizedWindowToolbar(String value) {
         super(value);
-        buildTools();
     }
 
     public SizedWindowToolbar() {

@@ -4,6 +4,7 @@
 package vaadin.tabsheet.windows;
 
 import com.vaadin.Application;
+import com.vaadin.terminal.ThemeResource;
 import com.vaadin.ui.Window;
 
 /**
@@ -21,7 +22,7 @@ public class ApplicationExample extends Application {
         MultiMode multiMode = new MultiMode();
         for (int i=0; i<10; i++){
         	String caption = "composant " + String.valueOf(i);
-        	multiMode.addTab(DummyComponents.getComponent(caption), caption);
+        	multiMode.addTab(DummyComponents.getComponent(caption), caption, new ThemeResource(caption));
         }
         multiMode.setSizeFull();
         
