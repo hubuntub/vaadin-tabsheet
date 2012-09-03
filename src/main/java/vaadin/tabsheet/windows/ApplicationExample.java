@@ -1,6 +1,4 @@
-/**
- * 
- */
+
 package vaadin.tabsheet.windows;
 
 import com.vaadin.Application;
@@ -20,9 +18,9 @@ public class ApplicationExample extends Application {
         Window mainWindow = new Window("Tabsheet <-> Windows Application");
         
         MultiMode multiMode = new MultiMode();
-        for (int i=0; i<10; i++){
-        	String caption = "composant " + String.valueOf(i);
-        	multiMode.addTab(DummyComponents.getComponent(caption), caption, new ThemeResource(caption));
+        for (int i=0; i<7; i++){
+        	String caption = "composant-" + String.valueOf(i);
+        	multiMode.addTab(DummyComponents.getComponent(caption), caption, new ThemeResource(caption + ".png"));
         }
         multiMode.setSizeFull();
         

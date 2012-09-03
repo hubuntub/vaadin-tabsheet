@@ -5,6 +5,9 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
+import vaadin.tabsheet.windows.SizedWindowToolbar;
+
+
 
 import com.vaadin.terminal.Resource;
 import com.vaadin.terminal.ThemeResource;
@@ -25,6 +28,8 @@ import com.vaadin.ui.themes.Reindeer;
  */
 
 /**
+ * MultiMode is a component that contains a tabsheet with multiple tabs
+ * we can switch the tabs to windows
  * @author houbeb
  *
  */
@@ -44,20 +49,31 @@ public class MultiMode extends VerticalLayout implements ClickListener{
 	private Button buttonTabs;
 	private Button buttonWindows;
 	
+	/**
+	 * build a verticalLayout containing a tabsheet with margins
+	 */
 	public MultiMode(){
 		this(true);
 	}
+	/**
+	 * build a verticalLayout containing a tabsheet
+	 * @param margin
+	 */
 	public MultiMode(boolean margin){
 		super();
 		buildAndAddToolButtons();
 		buildAndAddTabsheet();
-        
+	
         if (margin) {
             setMargin(true, true, true, true);
         }
         
         initMaps();
 	}
+	
+	/**
+	 * initialize the tabsheet
+	 */
 	private void buildAndAddTabsheet() {
 		tabsheet = new TabSheet();
         tabsheet.setSizeFull();
@@ -65,6 +81,9 @@ public class MultiMode extends VerticalLayout implements ClickListener{
         setExpandRatio(tabsheet, 1);
 		
 	}
+	/**
+	 * build buttons windows, tabs to switch from one mode to another
+	 */
 	private void buildAndAddToolButtons() {
 		HorizontalLayout toolButton = new HorizontalLayout();
 		toolButton.setHeight("50px");
@@ -81,6 +100,9 @@ public class MultiMode extends VerticalLayout implements ClickListener{
 		addComponent(toolButton);
 		
 	}
+	/**
+	 * initialize differents maps
+	 */
 	private void initMaps() {
         listComponents = new ArrayList<Component>();
         mapComponentsByIcon = new LinkedHashMap<String, List<Component>>();
@@ -90,6 +112,11 @@ public class MultiMode extends VerticalLayout implements ClickListener{
         mapIconByComponent = new LinkedHashMap<Component, String>();
     }
 
+	/**
+	 * feed the map components by caption
+	 * @param caption
+	 * @param c
+	 */
     private void alimenteSuperMap(String caption, Component c) {
         if (!mapComponentsByIcon.containsKey(caption)) {
             mapComponentsByIcon.put(caption, new ArrayList<Component>());
@@ -97,6 +124,13 @@ public class MultiMode extends VerticalLayout implements ClickListener{
         mapComponentsByIcon.get(caption).add(c);
     }
 
+    /**
+     * add tabs to the tabsheet icon must be not null
+     * @param c
+     * @param caption
+     * @param icon
+     * @return
+     */
     public Tab addTab(Component c, String caption, Resource icon) {
         Tab t = tabsheet.addTab(c, caption, icon);
         listComponents.add(c);
@@ -108,31 +142,31 @@ public class MultiMode extends VerticalLayout implements ClickListener{
 
         return t;
     }
-    public Tab addTab(Component c, String caption) {
-        Tab t = tabsheet.addTab(c, caption);
-        listComponents.add(c);
-        mapCaptionComponents.put(caption, c);
-        
-        mapCaptionByComponent.put(c, caption);
-        
-        return t;
-    }
 
+    /**
+     * remove the components from the tabsheet
+     */
     public void removeAllTabsContent() {
         initMaps();
         tabsheet.removeAllComponents();
     }
 
+    /**
+     * remove the tabsheet and the components
+     */
     public void removeAllTabs() {
         tabsheet.removeAllComponents();
         this.removeComponent(tabsheet);
     }
 
+    /**
+     * Build windows regrouped by the iconPath of different tabs
+     */
     public void switchToWindows() {
        
         nbreWindows = 0;
         Map<String, TabSheet> tabSheets = new HashMap<String, TabSheet>();
-        // Init tabsheets
+        // Init tabsheets (we regroup components (from the orginal Tabsheet) with the same iconPath in the same tabsheet)
         for (String iconPath : mapComponentsByIcon.keySet()) {
             TabSheet newTabsheet = new TabSheet();
             newTabsheet.addStyleName(Reindeer.TABSHEET_SMALL);
@@ -151,23 +185,17 @@ public class MultiMode extends VerticalLayout implements ClickListener{
                 icon = ((TabSheet) tabsheet).getTabIcon(c);
             }
                 tabsheet.removeComponent(c);
-                // unless it is a table, tabsheet shows nothing so we add a notifiqueComponent
-//                if (!(c instanceof Table)){
-//                	c = new NotifiqueComponent();
-//					((NotifiqueComponent) c).build("Pas de données");
-//                }
                 tabSheets.get(icon.toString()).addTab(c, caption, icon);
         }
         // Create windows
         for (String iconPath : tabSheets.keySet()) {
-            SizedWindowToolbar w = new SizedWindowToolbar("Regroupement de pdls par énergie");
-            Resource iconEnergy = new ThemeResource(iconPath);
-            w.setIcon(iconEnergy);
-            w.setStyleName("sizedWindowToolbar");
-//            // pour avoir des fenetres en cascade
-//            // FIXME trouver un autre moyen de faire
-//            w.setPositionX(SizedWindowToolbar.POSITIONS_X_Y[nbreWindows].getX());
-//            w.setPositionY(SizedWindowToolbar.POSITIONS_X_Y[nbreWindows].getY());
+            SizedWindowToolbar w = new SizedWindowToolbar(" ");
+            Resource icon = new ThemeResource(iconPath);
+            w.setIcon(icon);
+            nbreWindows++;
+            // set the positions of windows so that they can be visble          
+            w.setPositionX(SizedWindowToolbar.POSITIONS_X_Y[nbreWindows].getX());
+            w.setPositionY(SizedWindowToolbar.POSITIONS_X_Y[nbreWindows].getY());
             w.setWidth("400px");
             w.setHeight("300px");
             // Add tabsheet to windows
@@ -177,6 +205,9 @@ public class MultiMode extends VerticalLayout implements ClickListener{
         this.removeComponent(tabsheet);
     }
 
+    /**
+     * remove all windows
+     */
     public void removeAllWindows() {
         for (Window w : new ArrayList<Window>(getWindow().getChildWindows())) {
             getWindow().removeWindow(w);
@@ -184,6 +215,9 @@ public class MultiMode extends VerticalLayout implements ClickListener{
 
     }
 
+    /**
+     * rebuild the tabsheet from tha listComponents
+     */
     public void switchToTabs() {
         for (Component c : listComponents) {
             String caption = mapCaptionByComponent.get(c);
@@ -196,6 +230,10 @@ public class MultiMode extends VerticalLayout implements ClickListener{
         this.setExpandRatio(tabsheet, 1);
     }
 
+    /**
+     * used to notify the view that a tab has been selected
+     * @param caption
+     */
     public void selectTabByCaption(String caption) {
         tabsheet.setSelectedTab(mapCaptionComponents.get(caption));
     }
